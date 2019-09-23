@@ -1,0 +1,16 @@
+{
+	"version": "0.1",
+	"__metadata__":{
+		"license_url":"http://www.orphadata.org/cgi-bin/index.php#ontologies",
+		"licence":"CC BY 4.0",
+		"url":"http://www.orphadata.org/cgi-bin/rare_free.html"
+	},
+	"dumper": {
+		"data_url":"http://www.orphadata.org/data/xml/en_product1.xml",
+		"uncompress": false
+	},
+	"uploader":{
+		"parser": "parser:load_data",
+		"on_duplicates": "ignore"
+	}
+}
