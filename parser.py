@@ -18,6 +18,7 @@ import xml.etree.ElementTree as ET
     }
 }
 """
+
 def load_data(data_access):
 
     docs = parse_data(data_access)
@@ -35,7 +36,7 @@ def parse_data(data_access):
     # check if the file exist
     assert os.path.exists(data_dir), "input file '%s' does not exist" % data_dir
 
-    tree = Et.parse(data_dir)
+    tree = ET.parse(data_dir)
     root = tree.getroot()
     keys = ['OrphaNumber', 'Synonym', 'ICD-10', 'OMIMN', 'UMLS', 'MedDRA', 'MeSH']
 
@@ -55,6 +56,8 @@ def parse_data(data_access):
         result.append(disease)
 
     merged_list = merge_key(result)
+
+    return merged_list
 
 
 
