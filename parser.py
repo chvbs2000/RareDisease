@@ -66,7 +66,7 @@ def merge_key(my_list):
 
     out_dict = defaultdict(list)
 
-    for item in result:
+    for item in my_list:
         update_orpha_dict = defaultdict(list)
         update_orpha_dict['_id'] = item['disease_id']
         update_orpha_dict['orphanet'] = {}
