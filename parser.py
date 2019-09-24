@@ -47,7 +47,7 @@ def parse_data(data_access):
         disease['orphanet_id'] = d.find('OrphaNumber').text
         disease['xref'] = {}
         
-        if d.findall('SynonymList//Synonym')：
+        if d.findall('SynonymList//Synonym'):
             synonym = d.find('SynonymList//Synonym').text
         else:
             synonym = " - "
