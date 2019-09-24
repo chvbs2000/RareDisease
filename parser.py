@@ -45,8 +45,7 @@ def parse_data(data_access):
     for d in disorders:
         disease = {}
         disease['orphanet_id'] = d.find('OrphaNumber').text
-        disease['xref'] = {}
-        
+        disease['disease_id'] = d.attrib['id']
         if d.findall('SynonymList//Synonym'):
             synonym = d.find('SynonymList//Synonym').text
         else:
