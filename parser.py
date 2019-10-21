@@ -1,23 +1,6 @@
 import os
-import unicodedata
-from collections import defaultdict
 import xml.etree.ElementTree as ET
-
-"""
-{"_id":disease id,
-    "orphanet":{
-        "xref":[
-            {"orphanet id":____,
-             "ICD-10":____,
-             "OMIMN":____,
-             "UMLS":____,
-             "MedDRA":____,
-             "MeSH":____}
-        ]
-
-    }
-}
-"""
+from collections import defaultdict
 
 def load_data(data_access):
 
@@ -26,76 +9,108 @@ def load_data(data_access):
     for doc in docs:
         yield doc
 
-
-
 def parse_data(data_access):
 
-    file_name = "en_product1.xml"
-    data_dir = os.path.join(data_access, file_name)
+    #file_list = ["en_product1.xml", "en_product9_prev.xml", "en_product9_ages.xml"]
 
-    # check if the file exist
-    assert os.path.exists(data_dir), "input file '%s' does not exist" % data_dir
+    i = 1
+    # read files
+    for file_dir in data_access:
+        #data_dir = os.path.join(file_dir)
+        # check if the file exist
+        assert os.path.exists(file_dir), "input file '%s' does not exist" % file_dir
+        tree{}.format(str(i)) = ET.parse(file_dir)
+        I += 1
 
-    tree = ET.parse(data_dir)
-    root = tree.getroot()
-    keys = ['OrphaNumber', 'Synonym', 'ICD-10', 'OMIMN', 'UMLS', 'MedDRA', 'MeSH']
+    # tree1 = ET.parse('en_product1.xml')
+    # tree2 = ET.parse('en_product6.xml')
+    # tree5 = ET.parse('en_product9_prev.xml')
+    # tree6 = ET.parse('en_product9_ages.xml')
 
-    disorders = tree.findall('.//DisorderList//Disorder')
+    disease_path = './/DisorderList//Disorder'
+    disorders = tree1.findall(disease_path)
     result = []
+
+    # find cross-reference
     for d in disorders:
         disease = {}
-        disease['orphanet_id'] = d.find('OrphaNumber').text
-        disease['disease_id'] = d.attrib['id']
+        disease['_id'] = d.find('OrphaNumber').text
         if d.findall('SynonymList//Synonym'):
             synonym = d.find('SynonymList//Synonym').text
         else:
             synonym = " - "
-        disease['Synonym(s)'] = synonym
+        disease['synonyms'] = synonym
         external_reference = d.findall('ExternalReferenceList//ExternalReference')
         disease['xref'] = [{e.find('Source').text : e.find('Reference').text} for e in external_reference]
         result.append(disease)
 
-    merged_list = merge_key(result)
+    # find prevalence
+    prev_tree = tree2.findall(disease_path)
+    for idx, sub_dict in enumerate(result):
+        for p in prev_tree:
+            if sub_dict['_id'] == p.find('OrphaNumber').text:       
+                if p.findall('PrevalenceList//Prevalence//PrevalenceClass//Name'):
+                    prevalence = p.find('PrevalenceList//Prevalence//PrevalenceClass//Name').text
+                else:
+                    prevalence = " - "   
+                    
+            result[idx]['prevalence'] = prevalence
 
-    return merged_list
+    # find epidermiological data
+    epi_tree = tree3.findall(disease_path)
+    for idx, sub_dict in enumerate(result):
+        for epi in epi_tree:
+            if sub_dict['_id'] == epi.find('OrphaNumber').text:
+                if epi.findall('AverageAgeOfOnsetList//AverageAgeOfOnset//Name'):
+                    avg_onset = epi.findall('AverageAgeOfOnsetList//AverageAgeOfOnset')
+                    result[idx]['age_of_onset'] = [e.find('Name').text for e in avg_onset]
+                else:
+                    result[idx]['age_of_onset'] = " - "
+                
+                if epi.findall('TypeOfInheritanceList//TypeOfInheritance//Name'):
+                    inheritance = epi.find('TypeOfInheritanceList//TypeOfInheritance//Name').text
+                else:
+                    inheritance = " - "       
 
+            result[idx]['inheritance'] = inheritance
 
-
-def merge_key(my_list):
-
+def merge_xref_key(list_to_merge):
+    
     out_dict = defaultdict(list)
 
-    for item in my_list:
-        update_orpha_dict = defaultdict(list)
-        update_orpha_dict['_id'] = item['disease_id']
-        update_orpha_dict['orphanet'] = {}
-        update_orpha_dict['orphanet']['xref'] = {}
-        update_orpha_dict['orphanet']['xref']['orphanet_id'] = [item['orphanet_id']]
+    for item in result:
+        update_dict = {}
+        update_dict['_id'] = item['_id']
+        update_dict['orphanet'] = {}
+        update_dict['orphanet']['synonyms'] = item['synonyms']
+        update_dict['orphanet']['prevalence'] = item['prevalence']
+        update_dict['orphanet']['inheritance'] = item['inheritance']
+        update_dict['orphanet']['age_of_onset'] = item['age_of_onset']
+        update_dict['orphanet']['xref'] = {}
 
         for ref in item['xref']:
             cur_key = list(ref.keys())[0]
-            update_orpha_dict['orphanet']['xref'][cur_key] = update_orpha_dict['orphanet']['xref'].get(cur_key, [])+[ref[cur_key]]
-        
-        for k,v in update_orpha_dict['orphanet']['xref'].items():
+            update_dict['orphanet']['xref'][cur_key] = update_dict['orphanet']['xref'].get(cur_key, [])+[ref[cur_key]]
+
+        for k,v in update_dict['orphanet']['xref'].items():
             if len(v) == 1:
-                update_orpha_dict['orphanet']['xref'][k] = v[0]
+                update_dict['orphanet']['xref'][k] = v[0]
             else:
-                update_orpha_dict['orphanet']['xref'][k] = [sub_v for sub_v in v]
-        
-        out_dict[update_orpha_dict['_id']].append(update_orpha_dict)
+                update_dict['orphanet']['xref'][k] = [sub_v for sub_v in v]
+
+        out_dict[update_dict['_id']].append(update_dict)
 
     temp_output = []
     for value in out_dict.values():
         temp_output.append({
             '_id':value[0]['_id'],
             'orphanet':{
+                'synonyms':value[0]['orphanet']['synonyms'],
+                'prevalence':value[0]['orphanet']['prevalence'],
+                'inheritance':value[0]['orphanet']['inheritance'],
+                'age_of_onset':value[0]['orphanet']['age_of_onset'],
                 'xref':[v['orphanet']['xref'] for v in value]
             }
         })
 
     return temp_output
-
-
-
-
-

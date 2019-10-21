@@ -1,12 +1,12 @@
 {
-	"version": "0.1",
+	"version":"0.2",
 	"__metadata__":{
-		"license_url":"http://www.orphadata.org/cgi-bin/index.php#ontologies",
+		"license_url":"http://www.orphadata.org/cgi-bin/index.php",
 		"licence":"CC BY 4.0",
-		"url":"http://www.orphadata.org/cgi-bin/rare_free.html"
+		"url":"http://www.orphadata.org/cgi-bin/index.php"
 	},
 	"dumper": {
-		"data_url":"http://www.orphadata.org/data/xml/en_product1.xml",
+		"data_url":["http://www.orphadata.org/data/xml/en_product1.xml", "http://www.orphadata.org/data/xml/en_product9_prev.xml", "http://www.orphadata.org/data/xml/en_product9_ages.xml"],
 		"uncompress": false
 	},
 	"uploader":{
