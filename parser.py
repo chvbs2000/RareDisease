@@ -11,14 +11,14 @@ def load_data(data_access):
 
 def parse_data(data_access):
 
-    #file_list = ["en_product1.xml", "en_product9_prev.xml", "en_product9_ages.xml"]
+    file_list = ["en_product1.xml", "en_product9_prev.xml", "en_product9_ages.xml"]
 
     # read files
-    for idx, file_dir in enumerate(data_access):
-        #data_dir = os.path.join(file_dir)
+    for idx, data_dir in enumerate(data_access):
+        data_dir = os.path.join(data_dir, file_list[i])
         # check if the file exist
-        assert os.path.exists(file_dir), "input file '%s' does not exist" % file_dir
-        globals()['tree%s' % (i+1)] = ET.parse(file_dir)
+        assert os.path.exists(data_dir), "input file '%s' does not exist" % data_dir
+        globals()['tree%s' % (i+1)] = ET.parse(data_dir)
 
     # tree1 = ET.parse('en_product1.xml')
     # tree2 = ET.parse('en_product6.xml')
