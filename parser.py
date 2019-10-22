@@ -79,7 +79,7 @@ def merge_xref_key(list_to_merge):
     
     out_dict = defaultdict(list)
 
-    for item in result:
+    for item in list_to_merge:
         update_dict = {}
         update_dict['_id'] = item['_id']
         update_dict['orphanet'] = {}
