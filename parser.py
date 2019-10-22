@@ -73,6 +73,8 @@ def parse_data(data_access):
 
             result[idx]['inheritance'] = inheritance
 
+    return merge_xref_key(result)
+
 def merge_xref_key(list_to_merge):
     
     out_dict = defaultdict(list)
