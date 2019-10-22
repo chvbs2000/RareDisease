@@ -16,9 +16,9 @@ def parse_data(data_access):
     # read files
     for idx, file_dir in enumerate(data_access):
         data_dir = os.path.join(file_dir, file_list[idx])
-        print ()
         # check if the file exist
-        assert os.path.exists(data_dir), "input file '%s' does not exist" % data_dir
+        assert os.path.exists(data_dir), "input file '%s' does not exist" % (file_dir, data_dir)
+        #assert os.path.exists(data_dir), "input file '%s' does not exist" % data_dir
         globals()['tree%s' % (idx+1)] = ET.parse(data_dir)
 
     # tree1 = ET.parse('en_product1.xml')
