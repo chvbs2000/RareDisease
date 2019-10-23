@@ -62,16 +62,17 @@ def parse_data(data_access):
             if sub_dict['_id'] == epi.find('OrphaNumber').text:
                 if epi.findall('AverageAgeOfOnsetList//AverageAgeOfOnset//Name'):
                     avg_onset = epi.findall('AverageAgeOfOnsetList//AverageAgeOfOnset')
-                    result[idx]['age_of_onset'] = [e.find('Name').text for e in avg_onset]
+                    age_of_onset = [e.find('Name').text for e in avg_onset]
                 else:
-                    result[idx]['age_of_onset'] = " - "
-                
+                    age_of_onset = " - "
+
                 if epi.findall('TypeOfInheritanceList//TypeOfInheritance//Name'):
                     inheritance = epi.find('TypeOfInheritanceList//TypeOfInheritance//Name').text
                 else:
                     inheritance = " - "       
-
+                
             result[idx]['inheritance'] = inheritance
+            result[idx]['age_of_onset'] = age_of_onset
 
     return merge_xref_key(result)
 
