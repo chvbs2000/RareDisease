@@ -1,6 +1,9 @@
 import os
 import xml.etree.ElementTree as ET
 from collections import defaultdict
+import requests
+import json
+from biothings.utils.dataload import dict_sweep, open_anyfile
 
 def load_data(data_access):
 
