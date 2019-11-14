@@ -73,8 +73,9 @@ def parse_data(data_access):
                 
             result[idx]['inheritance'] = inheritance
             result[idx]['age_of_onset'] = age_of_onset
+    docs = merge_xref_key(result)
 
-    return merge_xref_key(result)
+    return orphanet2mondo(docs)
 
 def merge_xref_key(list_to_merge):
     
