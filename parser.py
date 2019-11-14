@@ -116,3 +116,45 @@ def merge_xref_key(list_to_merge):
         })
 
     return temp_output
+
+def orphanet2mondo(data_dict_list):
+    
+    orpha_list = []
+    
+    # build a list containing all Orphanet ID
+    for element in data_dict_list:
+        orpha_list.append(element['_id'])
+    
+    # romve duplicate Orphanet ID
+    orpha_set = list(map(int, set(orpha_list)))
+    
+    # retrieve MONDO ID from mydisease.info based on Orphanet ID
+    headers = {'content-type':'application/x-www-form-urlencoded'}
+    json_data = []
+
+    for i in range(0, len(orpha_set), 1000):
+        params = 'q={}&scopes=mondo.xrefs.orphanet&fields=_id'.format(str(orpha_set[i:i+1000]).replace('[','').replace(']',''))
+        res = requests.post('http://mydisease.info/v1/query', data=params, headers=headers)
+        json_subdata = json.loads(res.text)
+        json_data.extend(json_subdata)
+
+    # build ID conversion dictionary
+    orpha_mondo_dict = {}
+
+    for i in range(len(json_data)):
+        
+        if '_id' in json_data[i]:
+            orpha_mondo_dict[json_data[i]['query']] = json_data[i]['_id']
+        else:
+            orpha_mondo_dict[json_data[i]['query']] = "ORPHA:{}".format(str(json_data[i]['query']))
+
+    final_output = []
+        
+    # store updated gene dictionary in final_output list
+    for element in data_dict_list:
+        # convert Orphanet ID to Mondo ID
+        key = element['_id']
+        element['_id'] = orpha_mondo_dict[key]
+        final_output.append(element)
+
+    return final_output
